@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Assistant</title>
+    <style>
+        body {
+            background-color: #007bff; /* Set background color to open blue */
+            font-family: Arial, sans-serif; /* Set font family */
+            color: white; /* Set text color to white */
+            text-align: center; /* Center align text */
+            position: relative; /* Set position to relative for timer positioning */
+            height: 100vh; /* Set height to 100% of viewport height */
+        }
+        h1 {
+            margin-bottom: 30px; /* Add margin below h1 */
+            font-size: 36px; /* Increase font size */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for depth */
+        }
+        button {
+            padding: 10px 20px; /* Add padding to buttons */
+            font-size: 22px; /* Set font size for buttons */
+            background-color: #ffffff; /* Set button background color to white */
+            color: #007bff; /* Set button text color to open blue */
+            border: none; /* Remove button border */
+            cursor: pointer; /* Set cursor to pointer on hover */
+            margin: 10px; /* Add margin around buttons */
+        }
+        #timer-container {
+            position: absolute; /* Set position to absolute */
+            top: 100px; /* Set distance from top */
+            right: 20px; /* Set distance from right */
+            text-align: center; /* Center align text */
+        }
+        #timer {
+            font-size: 24px; /* Set font size for the timer */
+            border: 2px solid white; /* Add border */
+            border-radius: 50%; /* Make it circular */
+            width: 80px; /* Set width */
+            height: 80px; /* Set height */
+            line-height: 80px; /* Center text vertically */
+            text-align: center; /* Center text horizontally */
+        }
+        #welcome-text {
+            margin-top: 20px; /* Add margin above welcome text */
+            font-size: 18px; /* Set font size for welcome text */
+        }
+        .icon {
+            display: block;
+            margin: 15px auto; /* Center the icon horizontally and add margin */
+            width: 180px; /* Set width for the icon */
+            height: 180px; /* Set height for the icon */
+        }
+        #speech-response {
+            display: block;
+            margin: 0 auto; /* Center the audio horizontally */
+            margin-top: 20px; /* Add margin from the top */
+        }
+        #text-response {
+            display: none; /* Hide text response by default */
+            font-size: 20px; /* Set font size for text response */
+            background-color: rgba(255, 255, 255, 0.2); /* Set background color with transparency */
+            padding: 10px; /* Add padding */
+            border-radius: 10px; /* Add border radius */
+            margin-top: 20px; /* Add margin from the top */
+            max-width: 80%; /* Limit maximum width */
+            margin: 20px auto; /* Center horizontally */
+        }
+#answer-timer {
+    font-size: 24px; /* Set font size for the timer */
+    position: absolute; /* Set position to absolute */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center horizontally */
+    display: none; /* Hide answer timer by default */
+    width: 80px; /* Set width */
+    height: 80px; /* Set height */
+    bottom: 80px !important;
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    background-color: #007bff; /* Set background color */
+    color: white; /* Set text color */
+    border-radius: 50%; /* Make it circular */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Add shadow */
+    animation: pulse 1s infinite alternate; /* Add pulsating animation */
+    line-height: 80px; /* Center text vertically */
+    text-align: center; /* Center text horizontally */
+    border: none; /* Hide border initially */
+}
+
+#answer-timer.active {
+    border: 2px solid white; /* Show border when active */
+}
+    </style>
+</head>
+<body>
+    <h1 style="font-family: 'Arial Black', sans-serif; color: #fff; background-color: #007bff; padding: 6px; border-radius: 8px; text-align: center; text-transform: uppercase; box-shadow: 0 8px 12px rgba(0.0, 0.0, 0.0, 0.4); letter-spacing: 2px; font-size: 44px;">Interview Assistant</h1>
+    <button id="start-interview">Start Interview</button>
+    <img class="icon" src="https://png.pngtree.com/png-clipart/20230401/original/pngtree-smart-chatbot-cartoon-clipart-png-image_9015126.png" alt="icon"> <!-- Icon display -->
+    <div id="welcome-text" style="display: none;">
+        Welcome to the Interview Assistant for the position of Management Consulting! <br>
+        The duration of the interview is 15-20 minutes. Are you ready?
+    </div>
+    <div id="timer-container" style="display: none;">
+        <div id="timer">20:00</div> <!-- Timer display with initial value -->
+    </div>
+    <div id="text-response" style="display: none;"></div>
+    <audio id="speech-response" controls autoplay style="display: none;"></audio>
+    <div id="answer-timer"></div>
+
+    <script>
+        // Add event listener to the start interview button
+        document.getElementById('start-interview').addEventListener('click', () => {
+            // Display welcome text
+            document.getElementById('welcome-text').style.display = 'block';
+
+            // Display timer
+            document.getElementById('timer-container').style.display = 'block';
+
+            // Show answer button
+            const answerButton = document.createElement('button');
+            answerButton.innerText = 'Answer';
+            answerButton.id = 'answer';
+            answerButton.onclick = () => {
+                // Display answer timer
+                const answerTimer = document.getElementById('answer-timer');
+                answerTimer.innerText = '20';
+                answerTimer.classList.add('active'); // Add active class to show border
+                answerTimer.style.display = 'block';
+
+                // Position the answer timer below the answer button
+                const answerButtonRect = answerButton.getBoundingClientRect();
+                answerTimer.style.top = answerButtonRect.bottom + 10 + 'px';
+
+                // Start countdown for answer timer
+                let remainingTime = 20;
+                const countdown = setInterval(() => {
+                    remainingTime--;
+                    answerTimer.innerText = remainingTime;
+                    if (remainingTime <= 0) {
+                        clearInterval(countdown);
+                        answerTimer.style.display = 'none';
+                    }
+                }, 1000);
+
+                // Fetch the response from the Flask app
+                fetch('/answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Display text response
+                    const textResponse = document.getElementById('text-response');
+                    textResponse.innerText = data.text_response;
+                    textResponse.style.display = 'block';
+                    document.getElementById('welcome-text').style.display = 'none'; // Hide welcome text
+                    // Decode base64-encoded audio data
+                    const audioData = atob(data.speech_response);
+
+                    // Convert binary audio data to ArrayBuffer
+                    const buffer = new ArrayBuffer(audioData.length);
+                    const view = new Uint8Array(buffer);
+                    for (let i = 0; i < audioData.length; i++) {
+                        view[i] = audioData.charCodeAt(i);
+                    }
+
+                    // Create Blob from ArrayBuffer
+                    const blob = new Blob([buffer], { type: 'audio/mp3' });
+
+                    // Set audio source
+                    const audio = document.getElementById('speech-response');
+                    audio.src = URL.createObjectURL(blob);
+                    audio.style.display = 'block';
+                    audio.play(); // Start playing audio
+                })
+                .catch(error => console.error('Error:', error));
+            };
+            document.body.appendChild(answerButton);
+        });
+
+        // Countdown timer
+        const countdown = setInterval(() => {
+            const timer = document.getElementById('timer');
+            let timeLeft = timer.innerHTML.split(':');
+            let minutes = parseInt(timeLeft[0], 10);
+            let seconds = parseInt(timeLeft[1], 10);
+
+            if (seconds === 0) {
+                if (minutes === 0) {
+                    clearInterval(countdown);
+                    document.getElementById('start-interview').disabled = true; // Disable button when time's up
+                    return;
+                }
+                minutes--;
+                seconds = 59;
+            } else {
+                seconds--;
+            }
+
+            // Add leading zeros if necessary
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            timer.innerHTML = minutes + ':' + seconds;
+        }, 1000);
+    </script>
+</body>
+</html>
