@@ -106,7 +106,7 @@ def generate_response(input_text):
     messages.append({'role': 'user', 'content': input_text})
 
     response = client.chat.completions.create(
-  model="ft:gpt-3.5-turbo-0125:personal::99Vw4GZW",
+  model="ft:gpt-3.5-turbo-16k",
   messages=messages,
   max_tokens= 150,
 )
