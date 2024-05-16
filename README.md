@@ -4,7 +4,7 @@
 CaseAI:
 As part of a course on Generative AI technologies at INSEAD, I led a team of students to develop a product that would solve recruitment-related problems for consulting candidates and consulting companies.
 CaseAI is a chatbot that helps candidates improve critical case interview skills without a competent case preparation partner. For consulting companies, CaseAI provides an opportunity to help incoming candidates and increase their recruitment funnel.
-Check out our pitch video: ___
+Check out our pitch video: (https://github.com/KamilShaydullin/CaseAI/blob/main/CaseAI%20demo.mp4)
 
 Customer Journey:
 1. The user accesses the chatbot via a proprietary interface.
