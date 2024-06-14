@@ -106,9 +106,9 @@ def generate_response(input_text):
     messages.append({'role': 'user', 'content': input_text})
 
     response = client.chat.completions.create(
-  model="ft:gpt-3.5-turbo-16k",
+  model="gpt-3.5-turbo-0125",
   messages=messages,
-  max_tokens= 150,
+  max_tokens= 300,
 )
 
     # Extract and print the model's reply
